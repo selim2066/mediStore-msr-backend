@@ -1,1 +1,1 @@
-# mediStore-msr-backend
+# MediStore-MSR-backend
