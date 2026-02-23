@@ -3,14 +3,175 @@ generator client {
   output   = "../generated/prisma"
 }
 
+// datasource db {
+//   provider = "postgresql"
+// }
+
 datasource db {
   provider = "postgresql"
+ // url      = env("DATABASE_URL")
 }
 
+
+// model User {
+//     id        String   @id @default(uuid())
+//     email     String   @unique
+//     name      String?
+//     createdAt DateTime @default(now())
+//     updatedAt DateTime @updatedAt
+// }
+
+
+///////////////////////
+// ENUMS
+///////////////////////
+
+enum Role {
+  CUSTOMER
+  SELLER
+  ADMIN
+}
+
+enum OrderStatus {
+  PLACED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+///////////////////////
+// USER
+///////////////////////
+
 model User {
-    id        String   @id @default(uuid())
-    email     String   @unique
-    name      String?
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  id          String    @id @default(uuid())
+  name        String
+  email       String    @unique
+  password    String
+  phone       String?
+  address     String?
+  role        Role
+  isBanned    Boolean   @default(false)
+
+  medicines   Medicine[]   @relation("SellerMedicines")
+  orders      Order[]      @relation("CustomerOrders")
+  reviews     Review[]
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  @@map("users")
+  @@index([email])
+}
+
+///////////////////////
+// CATEGORY
+///////////////////////
+
+model Category {
+  id          String      @id @default(uuid())
+  name        String      @unique
+  description String?
+
+  medicines   Medicine[]
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  @@map("categories")
+}
+
+///////////////////////
+// MEDICINE
+///////////////////////
+
+model Medicine {
+  id            String     @id @default(uuid())
+  name          String
+  description   String
+  price         Float
+  stock         Int
+  manufacturer  String
+  image         String?
+
+  sellerId      String
+  seller        User       @relation("SellerMedicines", fields: [sellerId], references: [id])
+
+  categoryId    String
+  category      Category   @relation(fields: [categoryId], references: [id])
+
+  reviews       Review[]
+  orderItems    OrderItem[]
+
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@index([categoryId])
+  @@index([sellerId])
+  @@map("medicines")
+}
+
+///////////////////////
+// ORDER
+///////////////////////
+
+model Order {
+  id              String       @id @default(uuid())
+
+  customerId      String
+  customer        User         @relation("CustomerOrders", fields: [customerId], references: [id])
+
+  status          OrderStatus  @default(PLACED)
+
+  shippingAddress String
+  totalAmount     Float
+
+  items           OrderItem[]
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([customerId])
+  @@map("orders") // "order" is a reserved keyword in SQL
+}
+
+///////////////////////
+// ORDER ITEM
+///////////////////////
+
+model OrderItem {
+  id          String     @id @default(uuid())
+
+  orderId     String
+  order       Order      @relation(fields: [orderId], references: [id])
+
+  medicineId  String
+  medicine    Medicine   @relation(fields: [medicineId], references: [id])
+
+  quantity    Int
+  price       Float      // snapshot price at purchase time
+
+  @@index([orderId])
+  @@index([medicineId])
+}
+
+///////////////////////
+// REVIEW
+///////////////////////
+
+model Review {
+  id          String     @id @default(uuid())
+
+  rating      Int        // 1-5
+  comment     String?
+
+  userId      String
+  user        User       @relation(fields: [userId], references: [id])
+
+  medicineId  String
+  medicine    Medicine   @relation(fields: [medicineId], references: [id])
+
+  createdAt   DateTime   @default(now())
+
+  @@unique([userId, medicineId]) // one review per medicine per user
+  @@map("reviews")
 }
