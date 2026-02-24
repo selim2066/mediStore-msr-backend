@@ -1,26 +1,13 @@
+
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
 }
 
-// datasource db {
-//   provider = "postgresql"
-// }
-
 datasource db {
   provider = "postgresql"
  // url      = env("DATABASE_URL")
 }
-
-
-// model User {
-//     id        String   @id @default(uuid())
-//     email     String   @unique
-//     name      String?
-//     createdAt DateTime @default(now())
-//     updatedAt DateTime @updatedAt
-// }
-
 
 ///////////////////////
 // ENUMS
@@ -72,7 +59,7 @@ model Category {
   name        String      @unique
   description String?
 
-  medicines   Medicine[]
+  medicines   Medicine[]//this is the inverse relation field for the Medicine.category relation
 
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
@@ -141,7 +128,7 @@ model OrderItem {
   id          String     @id @default(uuid())
 
   orderId     String
-  order       Order      @relation(fields: [orderId], references: [id])
+  order       Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   medicineId  String
   medicine    Medicine   @relation(fields: [medicineId], references: [id])
@@ -150,7 +137,7 @@ model OrderItem {
   price       Float      // snapshot price at purchase time
 
   @@index([orderId])
-  @@index([orderId, medicineId]) // to prevent duplicate items in the same order
+  @@unique([orderId, medicineId]) // to prevent duplicate items in the same order
   @@map("order_items")
 }
 
@@ -175,4 +162,5 @@ model Review {
 
   @@unique([customerId, medicineId]) // one review per medicine per user
   @@map("reviews")
+
 }
