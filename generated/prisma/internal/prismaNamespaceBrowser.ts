@@ -79,7 +79,6 @@ export const UserScalarFieldEnum = {
   id: 'id',
   name: 'name',
   email: 'email',
-  password: 'password',
   phone: 'phone',
   address: 'address',
   role: 'role',
@@ -147,9 +146,10 @@ export const ReviewScalarFieldEnum = {
   id: 'id',
   rating: 'rating',
   comment: 'comment',
-  userId: 'userId',
+  customerId: 'customerId',
   medicineId: 'medicineId',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
 export type ReviewScalarFieldEnum = (typeof ReviewScalarFieldEnum)[keyof typeof ReviewScalarFieldEnum]

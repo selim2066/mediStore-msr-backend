@@ -48,7 +48,6 @@ model User {
   id          String    @id @default(uuid())
   name        String
   email       String    @unique
-  password    String
   phone       String?
   address     String?
   role        Role
@@ -151,7 +150,8 @@ model OrderItem {
   price       Float      // snapshot price at purchase time
 
   @@index([orderId])
-  @@index([medicineId])
+  @@index([orderId, medicineId]) // to prevent duplicate items in the same order
+  @@map("order_items")
 }
 
 ///////////////////////
@@ -164,14 +164,15 @@ model Review {
   rating      Int        // 1-5
   comment     String?
 
-  userId      String
-  user        User       @relation(fields: [userId], references: [id])
+  customerId      String
+  customer        User       @relation(fields: [customerId], references: [id])
 
   medicineId  String
   medicine    Medicine   @relation(fields: [medicineId], references: [id])
 
   createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 
-  @@unique([userId, medicineId]) // one review per medicine per user
+  @@unique([customerId, medicineId]) // one review per medicine per user
   @@map("reviews")
 }
