@@ -3,6 +3,7 @@ import cors from "cors";
 import express, { Application, Request, Response } from "express";
 import { auth } from "./lib/auth";
 import { CategoriesRoutes } from "./modules/categories/categories.route";
+import errorHandlerHelper from "./middlewares/errorHandlerHelpers";
 
 const app: Application = express();
 
@@ -25,4 +26,7 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Assalamu alaikum! Welcome to the MediStore API");
 });
 
+
+// Global error handler
+app.use(errorHandlerHelper)
 export default app;
