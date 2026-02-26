@@ -1,22 +1,28 @@
-import express, { Application, Request, Response } from 'express';
-import cors from 'cors';
-import { CategoriesRoutes } from './modules/categories/categories.route';
+import { toNodeHandler } from "better-auth/node";
+import cors from "cors";
+import express, { Application, Request, Response } from "express";
+import { auth } from "./lib/auth";
+import { CategoriesRoutes } from "./modules/categories/categories.route";
 
 const app: Application = express();
 
-// parsers
+// ✅ parsers FIRST
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.APP_URL || "http://localhost:5000",
+    credentials: true,
+  }),
+);
 
-// application routes
-// app.use('/api/v1', router);
+// ✅ THEN auth handler
+app.all("/api/auth/*splat", toNodeHandler(auth));
 
-// !categories routes
-app.use("/categories",CategoriesRoutes)
+// routes
+app.use("/categories", CategoriesRoutes);
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('Assalamu alaikum! Welcome to the MediStore API');
+app.get("/", (req: Request, res: Response) => {
+  res.send("Assalamu alaikum! Welcome to the MediStore API");
 });
-
 
 export default app;

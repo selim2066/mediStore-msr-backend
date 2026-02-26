@@ -6,7 +6,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
- // url      = env("DATABASE_URL")
+  // url      = env("DATABASE_URL")
 }
 
 ///////////////////////
@@ -32,20 +32,26 @@ enum OrderStatus {
 ///////////////////////
 
 model User {
-  id          String    @id @default(uuid())
-  name        String
-  email       String    @unique
-  phone       String?
-  address     String?
-  role        Role
-  isBanned    Boolean   @default(false)
+  id       String  @id @default(uuid())
+  name     String
+  email    String  @unique
+  phone    String?
+  address  String?
+  role     Role @default(CUSTOMER)
+  isBanned Boolean @default(false)
 
-  medicines   Medicine[]   @relation("SellerMedicines")
-  orders      Order[]      @relation("CustomerOrders")
-  reviews     Review[]
+  medicines Medicine[] @relation("SellerMedicines")
+  orders    Order[]    @relation("CustomerOrders")
+  reviews   Review[]
 
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  emailVerified Boolean   @default(false)
+  image         String?
+  sessions      Session[]
+  accounts      Account[]
+
   @@map("users")
   @@index([email])
 }
@@ -55,14 +61,15 @@ model User {
 ///////////////////////
 
 model Category {
-  id          String      @id @default(uuid())
-  name        String      @unique
+  id          String  @id @default(uuid())
+  name        String  @unique
   description String?
 
-  medicines   Medicine[]//this is the inverse relation field for the Medicine.category relation
+  medicines Medicine[] //this is the inverse relation field for the Medicine.category relation
 
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@map("categories")
 }
 
@@ -71,25 +78,25 @@ model Category {
 ///////////////////////
 
 model Medicine {
-  id            String     @id @default(uuid())
-  name          String
-  description   String
-  price         Float
-  stock         Int
-  manufacturer  String
-  image         String?
+  id           String  @id @default(uuid())
+  name         String
+  description  String
+  price        Float
+  stock        Int
+  manufacturer String
+  image        String?
 
-  sellerId      String
-  seller        User       @relation("SellerMedicines", fields: [sellerId], references: [id])
+  sellerId String
+  seller   User   @relation("SellerMedicines", fields: [sellerId], references: [id])
 
-  categoryId    String
-  category      Category   @relation(fields: [categoryId], references: [id])
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
 
-  reviews       Review[]
-  orderItems    OrderItem[]
+  reviews    Review[]
+  orderItems OrderItem[]
 
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([categoryId])
   @@index([sellerId])
@@ -101,23 +108,24 @@ model Medicine {
 ///////////////////////
 
 model Order {
-  id              String       @id @default(uuid())
+  id String @id @default(uuid())
 
-  customerId      String
-  customer        User         @relation("CustomerOrders", fields: [customerId], references: [id])
+  customerId String
+  customer   User   @relation("CustomerOrders", fields: [customerId], references: [id])
 
-  status          OrderStatus  @default(PLACED)
+  status OrderStatus @default(PLACED)
 
   shippingAddress String
   totalAmount     Float
 
-  items           OrderItem[]
+  items OrderItem[]
 
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
+  // "order" is a reserved keyword in SQL
   @@index([customerId])
-  @@map("orders") // "order" is a reserved keyword in SQL
+  @@map("orders")
 }
 
 ///////////////////////
@@ -125,19 +133,20 @@ model Order {
 ///////////////////////
 
 model OrderItem {
-  id          String     @id @default(uuid())
+  id String @id @default(uuid())
 
-  orderId     String
-  order       Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
-  medicineId  String
-  medicine    Medicine   @relation(fields: [medicineId], references: [id])
+  medicineId String
+  medicine   Medicine @relation(fields: [medicineId], references: [id])
 
-  quantity    Int
-  price       Float      // snapshot price at purchase time
+  quantity Int
+  price    Float // snapshot price at purchase time
 
+  // to prevent duplicate items in the same order
   @@index([orderId])
-  @@unique([orderId, medicineId]) // to prevent duplicate items in the same order
+  @@unique([orderId, medicineId])
   @@map("order_items")
 }
 
@@ -146,21 +155,70 @@ model OrderItem {
 ///////////////////////
 
 model Review {
-  id          String     @id @default(uuid())
+  id String @id @default(uuid())
 
-  rating      Int        // 1-5
-  comment     String?
+  rating  Int // 1-5
+  comment String?
 
-  customerId      String
-  customer        User       @relation(fields: [customerId], references: [id])
+  customerId String
+  customer   User   @relation(fields: [customerId], references: [id])
 
-  medicineId  String
-  medicine    Medicine   @relation(fields: [medicineId], references: [id])
+  medicineId String
+  medicine   Medicine @relation(fields: [medicineId], references: [id])
 
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  @@unique([customerId, medicineId]) // one review per medicine per user
+  // one review per medicine per user
+
+  @@unique([customerId, medicineId])
   @@map("reviews")
+}
 
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
 }
