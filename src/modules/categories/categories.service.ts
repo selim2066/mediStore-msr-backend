@@ -1,14 +1,43 @@
-import { Request, Response } from "express";
+import { prisma } from "../../lib/prisma";
 
+const getAllCategories = async () => {
+  return await prisma.category.findMany({
+    orderBy: { createdAt: "desc" },
+  });
+};
 
-const getCategories = async (req: Request, res: Response) => {
-    try {
-       res.send("Hello from Categories service")
-    } catch (error) {
-        throw new Error("Error fetching categories");
-    }
-}
+const getCategoryById = async (id: string) => {
+  return await prisma.category.findUnique({
+    where: { id },
+  });
+};
 
-export const CategoriesService = {
-    getCategories
-}
+const createCategory = async (data: { name: string; description?: string }) => {
+  return await prisma.category.create({
+    data,
+  });
+};
+
+const updateCategory = async (
+  id: string,
+  data: { name?: string; description?: string }
+) => {
+  return await prisma.category.update({
+    where: { id },
+    data,
+  });
+};
+
+const deleteCategory = async (id: string) => {
+  return await prisma.category.delete({
+    where: { id },
+  });
+};
+
+export const CategoryService = {
+  getAllCategories,
+  getCategoryById,
+  createCategory,
+  updateCategory,
+  deleteCategory,
+};

@@ -1,9 +1,18 @@
-import express, { Request, Response } from 'express';
-import { CategoriesController } from './categories.controller';
+import { Router } from "express";
+import { authMiddleware, UserRole } from "../../middlewares/authMiddleware";
+import { CategoryController } from "./categories.controller";
+
+const router = Router();
+// !category routes
 
 
-const router = express.Router()
+// public
+router.get("/", CategoryController.getAllCategories);
+router.get("/:id", CategoryController.getCategoryById);
 
-router.get("/", CategoriesController.getCategories)
+// admin only
+router.post("/", authMiddleware(UserRole.ADMIN), CategoryController.createCategory);
+router.put("/:id", authMiddleware(UserRole.ADMIN), CategoryController.updateCategory);
+router.delete("/:id", authMiddleware(UserRole.ADMIN), CategoryController.deleteCategory);
 
 export const CategoriesRoutes = router;
