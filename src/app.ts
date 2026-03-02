@@ -4,6 +4,7 @@ import express, { Application, Request, Response } from "express";
 import { auth } from "./lib/auth";
 import { CategoriesRoutes } from "./modules/categories/categories.route";
 import errorHandlerHelper from "./middlewares/errorHandlerHelpers";
+import { MedicineRoutes } from "./modules/medicine/medicine.route";
 
 const app: Application = express();
 
@@ -25,6 +26,9 @@ app.use("/categories", CategoriesRoutes);
 app.get("/", (req: Request, res: Response) => {
   res.send("Assalamu alaikum! Welcome to the MediStore API");
 });
+
+// medicine routes
+app.use("/medicine", MedicineRoutes);
 
 
 // Global error handler
