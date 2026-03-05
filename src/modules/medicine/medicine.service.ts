@@ -90,11 +90,15 @@ const getAllMedicinesService = async (query: GetAllMedicinesQuery) => {
   }
 
   // * e. Pagination & sorting using helper
-  const pagination = paginationSortingHelpers({ page, limit, sortBy, sortOrder });
-
+  const pagination = paginationSortingHelpers({
+    page,
+    limit,
+    sortBy,
+    sortOrder,
+  });
 
   const allMedicines = await prisma.medicine.findMany({
-    where:{ AND: andConditions.length > 0 ? andConditions : undefined },
+    where: { AND: andConditions.length > 0 ? andConditions : undefined },
     skip: pagination.skip,
     take: pagination.limit,
     orderBy: { [pagination.sortBy as string]: pagination.sortOrder },
@@ -106,7 +110,7 @@ const getAllMedicinesService = async (query: GetAllMedicinesQuery) => {
   const total_medicine = await prisma.medicine.count({
     where: andConditions.length > 0 ? { AND: andConditions } : undefined,
   });
- return {
+  return {
     meta: {
       page: pagination.page,
       limit: pagination.limit,
@@ -117,14 +121,87 @@ const getAllMedicinesService = async (query: GetAllMedicinesQuery) => {
   };
 };
 
-// !get medicine by id service
+// todo #3 get medicine by id service
 const getMedicineByIdService = async (id: string) => {
   return await prisma.medicine.findUnique({
     where: { id },
   });
 };
+
+// todo #4 update medicine service
+const updateMedicineService = async (
+  sellerId: string,
+  isAdmin: boolean,
+  id: string,
+  data: {
+    name?: string;
+    description?: string;
+    price?: number;
+    stock?: number;
+    manufacturer?: string;
+    image?: string;
+    categoryId?: string;
+  },
+) => {
+  if (!Object.keys(data).length) {
+    throw new Error("No fields provided to update");
+  }
+  // * 1. Check if medicine exists and belongs to the seller
+  const existingMedicine = await prisma.medicine.findUnique({
+    where: { id },
+  }); //here id is medicine id from params
+
+  if (!existingMedicine) {
+    throw new Error("Medicine not found");
+  }
+  if (!isAdmin && existingMedicine.sellerId !== sellerId) {
+    throw new Error("Unauthorized: You can only update your own medicines");
+  }
+
+  // * 2. If categoryId is being updated, verify it actually exists
+  if (data.categoryId) {
+    const categoryExists = await prisma.category.findUnique({
+      where: { id: data.categoryId },
+    });
+    if (!categoryExists) {
+      throw new Error("Category not found");
+    }
+  }
+
+  // * 3. Update the medicine
+  return await prisma.medicine.update({
+    where: { id },
+    data,
+  });
+};
+
+// todo #5 delete medicine service
+const deleteMedicineService = async (
+  param_id: string,
+  sellerId: string,
+  isAdmin: boolean,
+) => {
+  const medicine = await prisma.medicine.findUnique({
+    where: { id: param_id },
+  });
+  if (!medicine) {
+    const error: any = new Error("Medicine not found");
+    error.statusCode = 404;
+    throw error;
+  }
+  if (!isAdmin && medicine.sellerId !== sellerId) {
+    const error: any = new Error("Forbidden - You do not own this medicine");
+    error.statusCode = 403;
+    throw error;
+  }
+
+  return await prisma.medicine.delete({ where: { id: param_id } });
+};
+
 export const MedicineService = {
   createMedicineService,
   getAllMedicinesService,
   getMedicineByIdService,
+  updateMedicineService,
+  deleteMedicineService,
 };

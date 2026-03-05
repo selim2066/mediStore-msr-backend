@@ -5,6 +5,7 @@ import { auth } from "./lib/auth";
 import { CategoriesRoutes } from "./modules/categories/categories.route";
 import errorHandlerHelper from "./middlewares/errorHandlerHelpers";
 import { MedicineRoutes } from "./modules/medicine/medicine.route";
+import { OrdersRoutes } from "./modules/orders/order.route";
 
 const app: Application = express();
 
@@ -29,6 +30,8 @@ app.get("/", (req: Request, res: Response) => {
 
 // medicine routes
 app.use("/medicine", MedicineRoutes);
+// order routes
+app.use("/orders", OrdersRoutes);
 
 
 // Global error handler
