@@ -8,6 +8,7 @@ import { MedicineRoutes } from "./modules/medicine/medicine.route";
 import { OrdersRoutes } from "./modules/orders/order.route";
 import { authMiddleware } from "./middlewares/authMiddleware";
 import { ReviewsRoutes } from "./modules/reviews/reviews.routes";
+import { UserRoutes } from "./modules/User/user.route";
 
 const app: Application = express();
 
@@ -41,6 +42,7 @@ app.use("/api/categories", CategoriesRoutes);
 app.use("/api/medicine", MedicineRoutes);
 app.use("/api/orders", OrdersRoutes);
 app.use("/api/reviews", ReviewsRoutes);
+app.use("/api/admin/users", UserRoutes);
 
 app.use(errorHandlerHelper);
 app.use(errorHandlerHelper)

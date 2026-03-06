@@ -1,7 +1,7 @@
 import { prisma } from "../../lib/prisma";
 
 
-// customer can only review if they have a DELIVERED order containing this medicine
+// todo #1 customer can only review if they have a DELIVERED order containing this medicine
 const createReview = async (
   customerId: string,
   data: {
@@ -53,7 +53,7 @@ const createReview = async (
   });
 };
 
-// get all reviews for a medicine
+// todo #2 get all reviews for a medicine
 const getMedicineReviews = async (medicineId: string) => {
   // check medicine exists
   const medicine = await prisma.medicine.findUnique({

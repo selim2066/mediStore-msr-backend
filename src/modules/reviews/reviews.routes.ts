@@ -9,6 +9,6 @@ router.get("/medicine/:medicineId", ReviewController.getMedicineReviews);
 
 // customer only
 router.post("/", authMiddleware(UserRole.CUSTOMER), ReviewController.createReview);
-router.delete("/:id", authMiddleware(UserRole.CUSTOMER), ReviewController.deleteReview);
+router.delete("/:id", authMiddleware(UserRole.CUSTOMER, UserRole.ADMIN), ReviewController.deleteReview);
 
 export const ReviewsRoutes = router;
