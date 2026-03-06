@@ -6,8 +6,8 @@ const router = Router();
 
 // customer
 router.post("/", authMiddleware(UserRole.CUSTOMER), OrderController.createOrder);
-router.get("/", authMiddleware(UserRole.CUSTOMER), OrderController.getCustomerOrders);
-router.get("/:id", authMiddleware(UserRole.CUSTOMER), OrderController.getCustomerOrderById);
+router.get("/", authMiddleware(UserRole.CUSTOMER), OrderController.getCustomerOrders);//all orders of a customer
+router.get("/:id", authMiddleware(UserRole.CUSTOMER), OrderController.getCustomerOrderById);//single order details_orderId
 router.patch("/:id/cancel", authMiddleware(UserRole.CUSTOMER), OrderController.cancelOrder);
 
 // seller

@@ -1,7 +1,7 @@
 import { OrderStatus } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
 
-// create order with items and deduct stock
+// todo #1 create order with items and deduct stock
 const createOrder = async (
   customerId: string,
   data: {
@@ -70,7 +70,7 @@ const createOrder = async (
       },
     });
 
-    // deduct(reduce as medicine sell so stock will decrease) stock for each medicine
+    //* 3. deduct(reduce as medicine sell so stock will decrease) stock for each medicine
     await Promise.all(
       items.map((item) =>
         tx.medicine.update({
@@ -84,7 +84,7 @@ const createOrder = async (
   });
 };
 
-// get all orders for a customer
+// todo #2 get all orders for a customer
 const getCustomerOrders = async (customerId: string) => {
   return await prisma.order.findMany({
     where: { customerId },
@@ -99,7 +99,7 @@ const getCustomerOrders = async (customerId: string) => {
   });
 };
 
-// get single order for a customer
+// todo #3 get single order for a customer
 const getCustomerOrderById = async (id: string, customerId: string) => {
   const order = await prisma.order.findUnique({
     where: { id },
@@ -129,7 +129,7 @@ const getCustomerOrderById = async (id: string, customerId: string) => {
   return order;
 };
 
-// customer cancel order — only if PLACED
+// todo #4 customer cancel order — only if PLACED
 const cancelOrder = async (id: string, customerId: string) => {
   const order = await prisma.order.findUnique({
     where: { id },
@@ -176,7 +176,7 @@ const cancelOrder = async (id: string, customerId: string) => {
   });
 };
 
-// seller — get orders containing their medicines
+// todo #5 seller — get orders containing their medicines
 const getSellerOrders = async (sellerId: string) => {
   return await prisma.order.findMany({
     where: {
@@ -201,14 +201,14 @@ const getSellerOrders = async (sellerId: string) => {
   });
 };
 
-// valid status transitions for seller
+// todo #6.1 valid status transitions for seller
 const validTransitions: Record<string, OrderStatus> = {
   PLACED: OrderStatus.PROCESSING,
   PROCESSING: OrderStatus.SHIPPED,
   SHIPPED: OrderStatus.DELIVERED,
 };
 
-// seller — update order status
+// todo #6.2 seller — update order status
 const updateOrderStatus = async (
   id: string,
   sellerId: string,

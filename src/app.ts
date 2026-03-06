@@ -6,10 +6,12 @@ import { CategoriesRoutes } from "./modules/categories/categories.route";
 import errorHandlerHelper from "./middlewares/errorHandlerHelpers";
 import { MedicineRoutes } from "./modules/medicine/medicine.route";
 import { OrdersRoutes } from "./modules/orders/order.route";
+import { authMiddleware } from "./middlewares/authMiddleware";
+import { ReviewsRoutes } from "./modules/reviews/reviews.routes";
 
 const app: Application = express();
 
-// ✅ parsers FIRST
+// *✅ parsers FIRST
 app.use(express.json());
 app.use(
   cors({
@@ -18,22 +20,29 @@ app.use(
   }),
 );
 
-// ✅ THEN auth handler
-app.all("/api/auth/*splat", toNodeHandler(auth));
 
-// routes
-app.use("/categories", CategoriesRoutes);
+//* custom auth routes FIRST
+app.get("/api/auth/me", authMiddleware(), (req: Request, res: Response) => {
+  res.status(200).json({
+    success: true,
+    message: "Current user fetched successfully",
+    data: req.user,
+  });
+});
+
+//* then better-auth
+app.all("/api/auth/*splat", toNodeHandler(auth));
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Assalamu alaikum! Welcome to the MediStore API");
 });
 
-// medicine routes
-app.use("/medicine", MedicineRoutes);
-// order routes
-app.use("/orders", OrdersRoutes);
+app.use("/api/categories", CategoriesRoutes);
+app.use("/api/medicine", MedicineRoutes);
+app.use("/api/orders", OrdersRoutes);
+app.use("/api/reviews", ReviewsRoutes);
 
-
-// Global error handler
+app.use(errorHandlerHelper);
 app.use(errorHandlerHelper)
 export default app;
+
