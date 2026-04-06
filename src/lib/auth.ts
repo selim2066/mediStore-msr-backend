@@ -21,7 +21,7 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql", // or "mysql", "postgresql", ...etc
   }),
-  trustedOrigins: [process.env.APP_URL || "http://localhost:5000"],
+  trustedOrigins: [process.env.FRONTEND_URL || "http://localhost:3000"],
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true, // Set to true in production for better security
@@ -91,7 +91,7 @@ export const auth = betterAuth({
     additionalFields: {
       role: {
         type: "string",
-        required: false,
+        required: true,
         defaultValue: "CUSTOMER",
         input: true, // allow client to send it during signup
       },

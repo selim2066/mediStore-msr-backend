@@ -16,10 +16,16 @@ const app: Application = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: process.env.APP_URL || "http://localhost:5000",
+    origin: process.env.FRONTEND_URL || "http://localhost:3000", // ← frontend
     credentials: true,
   }),
 );
+// app.use(
+//   cors({
+//     origin: process.env.APP_URL || "http://localhost:5000",
+//     credentials: true,
+//   }),
+// );
 
 
 //* custom auth routes FIRST
