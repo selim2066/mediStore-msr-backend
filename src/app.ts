@@ -49,8 +49,10 @@ app.use("/api/medicine", MedicineRoutes);
 app.use("/api/orders", OrdersRoutes);
 app.use("/api/reviews", ReviewsRoutes);
 app.use("/api/admin/users", UserRoutes);
+app.use("/api/users", UserRoutes);
 
-app.use(errorHandlerHelper);
 app.use(errorHandlerHelper)
+
+
 export default app;
 

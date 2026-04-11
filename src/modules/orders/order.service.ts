@@ -272,6 +272,14 @@ const getAllOrdersAdmin = async () => {
   });
 };
 
+// admin — update order status without restrictions
+const updateOrderStatusAdmin = async (id: string, status: string) => {
+  return await prisma.order.update({
+    where: { id },
+     data: { status: status as OrderStatus },
+  });
+}
+
 export const OrderService = {
   createOrder,
   getCustomerOrders,
@@ -280,4 +288,5 @@ export const OrderService = {
   getSellerOrders,
   updateOrderStatus,
   getAllOrdersAdmin,
+  updateOrderStatusAdmin,
 };

@@ -57,7 +57,7 @@ const authMiddleware = (...role: UserRole[]) => {
         isBanned: session.user.isBanned as boolean,
       };
 
-      console.log("from authMiddleware req.user:", req.user);
+      //console.log("from authMiddleware req.user:", req.user);
 
       if (role.length && !role.includes(req.user.role as UserRole)) {
         return res.status(403).json({ message: "Forbidden bro..." });

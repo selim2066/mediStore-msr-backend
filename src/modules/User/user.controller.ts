@@ -45,7 +45,17 @@ const updateUserStatus = async (req: Request, res: Response, next: NextFunction)
   }
 };
 
+const getMe = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user = await UserService.getMe(req.user!.id);
+    res.status(200).json({ success: true, data: user });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const UserController = {
   getAllUsers,
   updateUserStatus,
+  getMe,
 };

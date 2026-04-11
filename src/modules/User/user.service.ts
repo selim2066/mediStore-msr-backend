@@ -30,7 +30,25 @@ const updateUserStatus = async (id: string, isBanned: boolean) => {
   });
 };
 
+const getMe = async (id: string) => {
+  return await prisma.user.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      phone: true,
+      address: true,
+      role: true,
+      isBanned: true,
+      image: true,
+      emailVerified: true,
+    },
+  });
+};
+
 export const UserService = {
   getAllUsers,
   updateUserStatus,
+  getMe,
 };

@@ -143,6 +143,14 @@ const getAllOrdersAdmin = async (
   }
 };
 
+const updateOrderStatusAdmin = async (req: Request, res: Response) => {
+  const id = req.params.id as string;
+  const { status } = req.body;
+
+  const order = await OrderService.updateOrderStatusAdmin(id, status);
+  res.json({ success: true, message: "Order status updated", data: order });
+}
+
 export const OrderController = {
   createOrder,
   getCustomerOrders,
@@ -151,4 +159,5 @@ export const OrderController = {
   getSellerOrders,
   updateOrderStatus,
   getAllOrdersAdmin,
+  updateOrderStatusAdmin,
 };

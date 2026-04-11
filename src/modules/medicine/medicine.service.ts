@@ -2,7 +2,7 @@ import paginationSortingHelpers from "../../helpers/paginationSortingHelper";
 import { prisma } from "../../lib/prisma";
 
 type GetAllMedicinesQuery = {
-  category?: string;
+  categoryId?: string;
   manufacturer?: string;
   minPrice?: string;
   maxPrice?: string;
@@ -38,7 +38,7 @@ const createMedicineService = async (
 //todo #2 !get all medicines service
 const getAllMedicinesService = async (query: GetAllMedicinesQuery) => {
   const {
-    category,
+    categoryId,
     manufacturer,
     minPrice,
     maxPrice,
@@ -52,8 +52,8 @@ const getAllMedicinesService = async (query: GetAllMedicinesQuery) => {
   const andConditions: any[] = [];
 
   // * a. category filter
-  if (category) {
-    andConditions.push({ categoryId: category });
+  if (categoryId) {
+    andConditions.push({ categoryId: categoryId });
   }
   //* b. manufacturer filter
   if (manufacturer) {
@@ -120,6 +120,17 @@ const getAllMedicinesService = async (query: GetAllMedicinesQuery) => {
     data: allMedicines,
   };
 };
+
+// todo #2.1 get seller medicines service
+const getSellerMedicinesService = async (sellerId: string) => {
+  return await prisma.medicine.findMany({
+    where: { sellerId },
+    include: {
+      category: { select: { id: true, name: true } },
+    },
+    orderBy: { createdAt: "desc" },
+  })
+}
 
 // todo #3 get medicine by id service
 const getMedicineByIdService = async (id: string) => {
@@ -201,6 +212,7 @@ const deleteMedicineService = async (
 export const MedicineService = {
   createMedicineService,
   getAllMedicinesService,
+    getSellerMedicinesService,
   getMedicineByIdService,
   updateMedicineService,
   deleteMedicineService,
