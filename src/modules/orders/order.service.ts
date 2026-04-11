@@ -1,4 +1,5 @@
-import { OrderStatus } from "../../../generated/prisma/client";
+
+import { OrderStatus } from "../../generated/prisma";
 import { prisma } from "../../lib/prisma";
 
 // todo #1 create order with items and deduct stock
