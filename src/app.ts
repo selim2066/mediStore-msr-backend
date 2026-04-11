@@ -20,12 +20,6 @@ app.use(
     credentials: true,
   }),
 );
-// app.use(
-//   cors({
-//     origin: process.env.APP_URL || "http://localhost:5000",
-//     credentials: true,
-//   }),
-// );
 
 
 //* custom auth routes FIRST
