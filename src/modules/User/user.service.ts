@@ -9,6 +9,7 @@ const getAllUsers = async () => {
       phone: true,
       role: true,
       isBanned: true,
+      emailVerified: true,
       createdAt: true,
     },
     orderBy: { createdAt: "desc" },

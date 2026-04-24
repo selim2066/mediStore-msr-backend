@@ -3,48 +3,11 @@ import { UserRole } from "../../middlewares/authMiddleware";
 import { MedicineService } from "./medicine.service";
 
 // todo create-medicine-controller
-// const createMedicineController = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction,
-// ) => {
-//   try {
-//     const { name, description, price, stock, manufacturer, image, categoryId } =
-//       req.body;
 
-//     if (
-//       !name ||
-//       !description ||
-//       !price ||
-//       !stock ||
-//       !manufacturer ||
-//       !categoryId
-//     ) {
-//       res
-//         .status(400)
-//         .json({ success: false, message: "All fields are required" });
-//       return;
-//     }
-
-//     const medicine = await MedicineService.createMedicineService(req.user!.id, {
-//       name,
-//       description,
-//       price: parseFloat(price),
-//       stock: parseInt(stock),
-//       manufacturer,
-//       image,
-//       categoryId,
-//     });
-//     res.status(201).json({ success: true, data: medicine });
-//   } catch (error) {
-//     console.log("CREATE MEDICINE ERROR:", error);
-//     next(error);
-//   }
-// };
 const createMedicineController = async (req:Request, res:Response, next:NextFunction) => {
   try {
-    console.log("BODY:", req.body); // debug
-    console.log("FILE:", req.file); // debug
+   // console.log("BODY:", req.body); // debug
+   // console.log("FILE:", req.file); // debug
 
     const {
       name,
