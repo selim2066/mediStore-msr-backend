@@ -5,17 +5,16 @@ import { auth } from '../../lib/auth';
 
 export const initiatePayment = async (req: Request, res: Response) => {
   try {
-    const sessionToken =
-      req.headers['x-session-token'] as string;
+    const sessionToken = req.headers['x-session-token'] as string;
+    const cookieName = req.headers['x-cookie-name'] as string || 'medistore.session_token';
 
     if (!sessionToken) {
       return res.status(401).json({ success: false, message: 'Unauthorized' });
     }
 
-    // Pass token as cookie header so better-auth can validate it properly
     const session = await auth.api.getSession({
       headers: new Headers({
-        cookie: `medistore.session_token=${sessionToken}`,
+        cookie: `${cookieName}=${sessionToken}`,
       }),
     });
 
