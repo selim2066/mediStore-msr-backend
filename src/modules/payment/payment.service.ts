@@ -39,6 +39,7 @@ export const initiatePayment = async (orderId: string, userId: string) => {
     num_of_item: order.items.length,
   };
 
+  console.log('SSLCommerz payload:', JSON.stringify(payload, null, 2));
   const response = await sslcommerz.init(payload);
 
   if (!response?.GatewayPageURL) {
