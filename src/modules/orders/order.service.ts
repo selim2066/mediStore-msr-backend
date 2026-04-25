@@ -8,9 +8,10 @@ const createOrder = async (
   data: {
     shippingAddress: string;
     items: { medicineId: string; quantity: number }[];
+    paymentMethod?: "CASH_ON_DELIVERY" | "ONLINE";
   },
 ) => {
-  const { shippingAddress, items } = data;
+  const { shippingAddress, items, paymentMethod } = data;
 
   //?* ## use transaction — all or nothing
   return await prisma.$transaction(async (tx) => {
@@ -19,13 +20,12 @@ const createOrder = async (
     //* 1. validate stock and calculate total
     const orderItems = await Promise.all(
       items.map(async (item) => {
-        
         // Find medicine in database
         const medicine = await tx.medicine.findUnique({
           where: { id: item.medicineId },
         });
 
-          // Check medicine exists
+        // Check medicine exists
         if (!medicine) {
           const error: any = new Error(
             `Medicine not found: ${item.medicineId}`,
@@ -53,11 +53,30 @@ const createOrder = async (
     );
 
     //* 2. create order with items
+    // const order = await tx.order.create({
+    //   data: {
+    //     customerId,
+    //     shippingAddress,
+    //     totalAmount,
+    //     items: {
+    //       create: orderItems,
+    //     },
+    //   },
+    //   include: {
+    //     items: {
+    //       include: {
+    //         medicine: { select: { id: true, name: true, image: true } },
+    //       },
+    //     },
+    //   },
+    // });
     const order = await tx.order.create({
       data: {
         customerId,
         shippingAddress,
         totalAmount,
+        paymentMethod: paymentMethod ?? "CASH_ON_DELIVERY", // ← new
+        paymentStatus: "PENDING", // ← new
         items: {
           create: orderItems,
         },
@@ -277,9 +296,9 @@ const getAllOrdersAdmin = async () => {
 const updateOrderStatusAdmin = async (id: string, status: string) => {
   return await prisma.order.update({
     where: { id },
-     data: { status: status as OrderStatus },
+    data: { status: status as OrderStatus },
   });
-}
+};
 
 export const OrderService = {
   createOrder,
@@ -291,3 +310,5 @@ export const OrderService = {
   getAllOrdersAdmin,
   updateOrderStatusAdmin,
 };
+
+// ! with payment version:

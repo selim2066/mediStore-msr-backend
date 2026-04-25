@@ -27,6 +27,18 @@ enum OrderStatus {
   CANCELLED
 }
 
+enum PaymentMethod {
+  CASH_ON_DELIVERY
+  ONLINE
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  CANCELLED
+}
+
 ///////////////////////
 // USER
 ///////////////////////
@@ -114,6 +126,10 @@ model Order {
   customer   User   @relation("CustomerOrders", fields: [customerId], references: [id])
 
   status OrderStatus @default(PLACED)
+
+   paymentMethod   PaymentMethod @default(CASH_ON_DELIVERY)  // ← new
+  paymentStatus   PaymentStatus @default(PENDING)           // ← new
+  transactionId   String?  // ← new, for online payments
 
   shippingAddress String
   totalAmount     Float

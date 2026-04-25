@@ -9,11 +9,13 @@ import { OrdersRoutes } from "./modules/orders/order.route";
 import { authMiddleware } from "./middlewares/authMiddleware";
 import { ReviewsRoutes } from "./modules/reviews/reviews.routes";
 import { UserRoutes } from "./modules/User/user.route";
-
+import { PaymentRoutes } from "./modules/payment/payment.route"; // ← new
 const app: Application = express();
 
 // *✅ parsers FIRST
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // ← new — required for SSLCommerz POST callbacks
+
 app.use(
   cors({
     origin: process.env.FRONTEND_URL || "http://localhost:3000", // ← frontend
@@ -44,6 +46,7 @@ app.use("/api/orders", OrdersRoutes);
 app.use("/api/reviews", ReviewsRoutes);
 app.use("/api/admin/users", UserRoutes);
 app.use("/api/users", UserRoutes);
+app.use("/api/payment", PaymentRoutes); // ← new
 
 app.use(errorHandlerHelper)
 
