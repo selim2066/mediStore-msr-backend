@@ -1,29 +1,26 @@
 //! v2.01
 import { Request, Response } from 'express';
 import * as PaymentService from './payment.service';
-import { prisma } from '../../lib/prisma';
+import { auth } from '../../lib/auth';
 
 export const initiatePayment = async (req: Request, res: Response) => {
   try {
-    // Try cookie-based session first (works locally)
-    // Fall back to x-session-token header (works in production cross-origin)
     const sessionToken =
-      req.headers['x-session-token'] as string ||
-      req.cookies?.['medistore.session_token'] ||
-      req.cookies?.['__Secure-medistore.session_token'];
+      req.headers['x-session-token'] as string;
 
     if (!sessionToken) {
       return res.status(401).json({ success: false, message: 'Unauthorized' });
     }
 
-    // Look up session directly in database
-    const session = await prisma.session.findUnique({
-      where: { token: sessionToken },
-      include: { user: true },
+    // Pass token as cookie header so better-auth can validate it properly
+    const session = await auth.api.getSession({
+      headers: new Headers({
+        cookie: `medistore.session_token=${sessionToken}`,
+      }),
     });
 
-    if (!session || session.expiresAt < new Date()) {
-      return res.status(401).json({ success: false, message: 'Session expired' });
+    if (!session) {
+      return res.status(401).json({ success: false, message: 'Unauthorized' });
     }
 
     if (session.user.isBanned) {
@@ -137,7 +134,6 @@ export const handleIpn = async (req: Request, res: Response) => {
 //     res.status(200).json({ success: false });
 //   }
 // };
-
 
 // import { Request, Response } from 'express';
 // import * as PaymentService from './payment.service';
