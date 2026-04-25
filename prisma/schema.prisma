@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
   //output   = "../src/generated/prisma"
@@ -49,7 +48,7 @@ model User {
   email    String  @unique
   phone    String?
   address  String?
-  role     Role @default(CUSTOMER)
+  role     Role    @default(CUSTOMER)
   isBanned Boolean @default(false)
 
   medicines Medicine[] @relation("SellerMedicines")
@@ -64,8 +63,8 @@ model User {
   sessions      Session[]
   accounts      Account[]
 
-  @@map("users")
   @@index([email])
+  @@map("users")
 }
 
 ///////////////////////
@@ -127,9 +126,9 @@ model Order {
 
   status OrderStatus @default(PLACED)
 
-   paymentMethod   PaymentMethod @default(CASH_ON_DELIVERY)  // ← new
-  paymentStatus   PaymentStatus @default(PENDING)           // ← new
-  transactionId   String?  // ← new, for online payments
+  paymentMethod PaymentMethod @default(CASH_ON_DELIVERY) // ← new
+  paymentStatus PaymentStatus @default(PENDING) // ← new
+  transactionId String? // ← new, for online payments
 
   shippingAddress String
   totalAmount     Float
@@ -160,9 +159,9 @@ model OrderItem {
   quantity Int
   price    Float // snapshot price at purchase time
 
+  @@unique([orderId, medicineId])
   // to prevent duplicate items in the same order
   @@index([orderId])
-  @@unique([orderId, medicineId])
   @@map("order_items")
 }
 
