@@ -82,21 +82,123 @@ export const auth = betterAuth({
         const info = await transporter.sendMail({
           from: `"MediStore" <${process.env.APP_EMAIL}>`,
           to: user.email,
-          subject: "Please verify your email address",
-          text: `Verify your email: ${verificationURL}`,
+          subject: "Verify your MediStore account",
+          text: `Assalamu Alaikum ${user.name || "User"},
+
+Welcome to MediStore.
+
+Please verify your email address by visiting the link below:
+
+${verificationURL}
+
+If you did not create this account, you can ignore this email.
+`,
           html: `
-        <div style="font-family: Arial; padding: 40px;">
-          <h2>Verify Your Email Address</h2>
-          <p>Assalamu Alaikum ${user.name || "User"},</p>
-          <p>Please confirm your email by clicking below:</p>
-          <a href="${verificationURL}"
-            style="background:#2563eb;color:white;padding:10px 20px;text-decoration:none;border-radius:6px;">
-            Verify Email
-          </a>
-          <p>If the button doesn't work, copy this link:</p>
-          <p>${verificationURL}</p>
-        </div>
-      `,
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Verify Your Email</title>
+</head>
+
+<body style="margin:0;padding:0;background:#f3f6fb;font-family:Arial,Helvetica,sans-serif;">
+
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f3f6fb;padding:40px 16px;">
+<tr>
+<td align="center">
+
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0"
+style="max-width:620px;background:#ffffff;border-radius:22px;overflow:hidden;box-shadow:0 20px 60px rgba(15,23,42,.08);">
+
+<!-- HEADER -->
+<tr>
+<td style="background:linear-gradient(135deg,#0f172a,#1d4ed8,#06b6d4);padding:42px 34px;text-align:center;">
+
+<div style="width:78px;height:78px;margin:0 auto 18px;border-radius:50%;background:rgba(255,255,255,.16);line-height:78px;font-size:36px;">
+💊
+</div>
+
+<p style="margin:0;color:#bfdbfe;font-size:13px;letter-spacing:2px;font-weight:700;">
+MEDISTORE
+</p>
+
+<h1 style="margin:12px 0 8px;color:#ffffff;font-size:30px;line-height:1.2;">
+Welcome to MediStore
+</h1>
+
+<p style="margin:0;color:#dbeafe;font-size:15px;line-height:1.7;max-width:460px;">
+Trusted medicine marketplace with secure ordering and reliable healthcare access.
+</p>
+
+</td>
+</tr>
+
+<!-- BODY -->
+<tr>
+<td style="padding:38px 34px;">
+
+<h2 style="margin:0 0 14px;font-size:24px;color:#0f172a;">
+Assalamu Alaikum ${user.name || "User"} 👋
+</h2>
+
+<p style="margin:0 0 16px;color:#475569;font-size:15px;line-height:1.8;">
+Thank you for joining <strong>MediStore</strong>. Please verify your email address to activate your account.
+</p>
+
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0"
+style="margin:24px 0;background:#f8fafc;border:1px solid #e2e8f0;border-radius:16px;">
+<tr>
+<td style="padding:18px 20px;color:#334155;font-size:14px;line-height:2;">
+✅ Trusted Sellers<br/>
+🚚 Fast Delivery<br/>
+🔒 Secure Payments<br/>
+💙 Easy Medicine Access
+</td>
+</tr>
+</table>
+
+<table role="presentation" cellspacing="0" cellpadding="0" style="margin:28px 0;">
+<tr>
+<td align="center">
+<a href="${verificationURL}"
+style="background:linear-gradient(135deg,#2563eb,#06b6d4);color:#ffffff;text-decoration:none;padding:16px 34px;font-size:16px;font-weight:700;border-radius:12px;display:inline-block;box-shadow:0 10px 24px rgba(37,99,235,.28);">
+Verify My Email →
+</a>
+</td>
+</tr>
+</table>
+
+<p style="margin:0 0 10px;color:#64748b;font-size:14px;">
+If the button doesn't work, copy this secure link:
+</p>
+
+<p style="margin:0;padding:14px;background:#f8fafc;border:1px dashed #cbd5e1;border-radius:12px;color:#2563eb;font-size:13px;word-break:break-all;line-height:1.6;">
+${verificationURL}
+</p>
+
+</td>
+</tr>
+
+<!-- FOOTER -->
+<tr>
+<td style="padding:24px 34px;background:#f8fafc;border-top:1px solid #e2e8f0;">
+<p style="margin:0;color:#64748b;font-size:13px;line-height:1.8;text-align:center;">
+This verification link may expire for security reasons.<br/>
+© ${new Date().getFullYear()} MediStore. All rights reserved.
+</p>
+</td>
+</tr>
+
+</table>
+
+</td>
+</tr>
+</table>
+
+</body>
+</html>
+`,
         });
 
         console.log("[EMAIL] Verification email sent:", {
