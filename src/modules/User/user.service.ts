@@ -1,19 +1,43 @@
+import paginationSortingHelpers from "../../helpers/paginationSortingHelper";
 import { prisma } from "../../lib/prisma";
 
-const getAllUsers = async () => {
-  return await prisma.user.findMany({
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      phone: true,
-      role: true,
-      isBanned: true,
-      emailVerified: true,
-      createdAt: true,
-    },
-    orderBy: { createdAt: "desc" },
+// ✅ UPDATED — added pagination
+const getAllUsers = async (
+  options: { page?: number | string; limit?: number | string } = {}
+) => {
+  const { page, limit, skip } = paginationSortingHelpers({
+    page: options.page,
+    limit: options.limit,
   });
+
+  const [data, total] = await Promise.all([
+    prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        role: true,
+        isBanned: true,
+        emailVerified: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: "desc" },
+      skip,
+      take: limit,
+    }),
+    prisma.user.count(),
+  ]);
+
+  return {
+    data,
+    meta: {
+      page,
+      limit,
+      totalUsers: total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
 };
 
 const updateUserStatus = async (id: string, isBanned: boolean) => {

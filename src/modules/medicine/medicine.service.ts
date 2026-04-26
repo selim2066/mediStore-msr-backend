@@ -122,15 +122,38 @@ const getAllMedicinesService = async (query: GetAllMedicinesQuery) => {
 };
 
 // todo #2.1 get seller medicines service
-const getSellerMedicinesService = async (sellerId: string) => {
-  return await prisma.medicine.findMany({
-    where: { sellerId },
-    include: {
-      category: { select: { id: true, name: true } },
+const getSellerMedicinesService = async (
+  sellerId: string,
+  options: { page?: number | string; limit?: number | string } = {}
+) => {
+  const { page, limit, skip } = paginationSortingHelpers({
+    page: options.page,
+    limit: options.limit,
+  });
+
+  const [data, total] = await Promise.all([
+    prisma.medicine.findMany({
+      where: { sellerId },
+      include: {
+        category: { select: { id: true, name: true } },
+      },
+      orderBy: { createdAt: "desc" },
+      skip,
+      take: limit,
+    }),
+    prisma.medicine.count({ where: { sellerId } }),
+  ]);
+
+  return {
+    data,
+    meta: {
+      page,
+      limit,
+      total_medicine: total,
+      totalPages: Math.ceil(total / limit),
     },
-    orderBy: { createdAt: "desc" },
-  })
-}
+  };
+};
 
 // todo #3 get medicine by id service
 const getMedicineByIdService = async (id: string) => {

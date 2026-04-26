@@ -69,15 +69,22 @@ const getAllMedicineController = async (
     next(error);
   }
 };
+
 // todo get seller medicines controller
+// ✅ UPDATED — pass page & limit from query
 const getSellerMedicinesController = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const medicines = await MedicineService.getSellerMedicinesService(req.user!.id)
-    res.status(200).json({ success: true, data: medicines })
+    const { page, limit } = req.query;
+    const result = await MedicineService.getSellerMedicinesService(req.user!.id, {
+      page: page as string,
+      limit: limit as string,
+    });
+    res.status(200).json({ success: true, message: "Medicines fetched successfully", data: result });
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
+};
+
 // todo get medicine by id controller
 const getMedicineByIdController = async (
   req: Request,
@@ -157,6 +164,8 @@ const deleteMedicineController = async (
     next(error);
   }
 };
+
+
 export const MedicineController = {
   createMedicineController,
   getAllMedicineController,

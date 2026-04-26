@@ -2,13 +2,18 @@ import { NextFunction, Request, Response } from "express";
 import { UserService } from "./user.service";
 
 
+// ✅ UPDATED — pass page & limit from query
 const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const users = await UserService.getAllUsers();
+    const { page, limit } = req.query;
+    const result = await UserService.getAllUsers({
+      page: page as string,
+      limit: limit as string,
+    });
     res.status(200).json({
       success: true,
       message: "Users fetched successfully",
-      data: users,
+      data: result,
     });
   } catch (error) {
     next(error);

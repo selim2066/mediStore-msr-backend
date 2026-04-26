@@ -1,6 +1,7 @@
 import { OrderStatus } from "@prisma/client";
 //import { OrderStatus } from "../../generated/prisma";
 import { prisma } from "../../lib/prisma";
+import paginationSortingHelpers from "../../helpers/paginationSortingHelper";
 
 // todo #1 create order with items and deduct stock
 const createOrder = async (
@@ -197,28 +198,53 @@ const cancelOrder = async (id: string, customerId: string) => {
 };
 
 // todo #5 seller — get orders containing their medicines
-const getSellerOrders = async (sellerId: string) => {
-  return await prisma.order.findMany({
-    where: {
-      items: {
-        some: {
-          medicine: { sellerId },
-        },
-      },
-    },
-    include: {
-      items: {
-        where: {
-          medicine: { sellerId },
-        },
-        include: {
-          medicine: { select: { id: true, name: true, image: true } },
-        },
-      },
-      customer: { select: { id: true, name: true, email: true, phone: true } },
-    },
-    orderBy: { createdAt: "desc" },
+const getSellerOrders = async (
+  sellerId: string,
+  options: { page?: number | string; limit?: number | string } = {}
+) => {
+  const { page, limit, skip } = paginationSortingHelpers({
+    page: options.page,
+    limit: options.limit,
   });
+
+  const where = {
+    items: {
+      some: {
+        medicine: { sellerId },
+      },
+    },
+  };
+
+  const [data, total] = await Promise.all([
+    prisma.order.findMany({
+      where,
+      include: {
+        items: {
+          where: {
+            medicine: { sellerId },
+          },
+          include: {
+            medicine: { select: { id: true, name: true, image: true } },
+          },
+        },
+        customer: { select: { id: true, name: true, email: true, phone: true } },
+      },
+      orderBy: { createdAt: "desc" },
+      skip,
+      take: limit,
+    }),
+    prisma.order.count({ where }),
+  ]);
+
+  return {
+    data,
+    meta: {
+      page,
+      limit,
+      totalOrders: total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
 };
 
 // todo #6.1 valid status transitions for seller
@@ -277,19 +303,41 @@ const updateOrderStatus = async (
   });
 };
 
-// admin — get all orders
-const getAllOrdersAdmin = async () => {
-  return await prisma.order.findMany({
-    include: {
-      items: {
-        include: {
-          medicine: { select: { id: true, name: true } },
-        },
-      },
-      customer: { select: { id: true, name: true, email: true } },
-    },
-    orderBy: { createdAt: "desc" },
+// ✅ UPDATED — admin get all orders with pagination
+const getAllOrdersAdmin = async (
+  options: { page?: number | string; limit?: number | string } = {}
+) => {
+  const { page, limit, skip } = paginationSortingHelpers({
+    page: options.page,
+    limit: options.limit,
   });
+
+  const [data, total] = await Promise.all([
+    prisma.order.findMany({
+      include: {
+        items: {
+          include: {
+            medicine: { select: { id: true, name: true } },
+          },
+        },
+        customer: { select: { id: true, name: true, email: true } },
+      },
+      orderBy: { createdAt: "desc" },
+      skip,
+      take: limit,
+    }),
+    prisma.order.count(),
+  ]);
+
+  return {
+    data,
+    meta: {
+      page,
+      limit,
+      totalOrders: total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
 };
 
 // admin — update order status without restrictions

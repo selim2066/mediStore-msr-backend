@@ -81,18 +81,15 @@ const cancelOrder = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const getSellerOrders = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+// ✅ UPDATED — pass page & limit from query
+const getSellerOrders = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const orders = await OrderService.getSellerOrders(req.user!.id);
-    res.status(200).json({
-      success: true,
-      message: "Seller orders fetched successfully",
-      data: orders,
+    const { page, limit } = req.query;
+    const result = await OrderService.getSellerOrders(req.user!.id, {
+      page: page as string,
+      limit: limit as string,
     });
+    res.status(200).json({ success: true, message: "Seller orders fetched successfully", data: result });
   } catch (error) {
     next(error);
   }
@@ -126,18 +123,15 @@ const updateOrderStatus = async (
   }
 };
 
-const getAllOrdersAdmin = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+// ✅ UPDATED — pass page & limit from query
+const getAllOrdersAdmin = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const orders = await OrderService.getAllOrdersAdmin();
-    res.status(200).json({
-      success: true,
-      message: "All orders fetched successfully",
-      data: orders,
+    const { page, limit } = req.query;
+    const result = await OrderService.getAllOrdersAdmin({
+      page: page as string,
+      limit: limit as string,
     });
+    res.status(200).json({ success: true, message: "All orders fetched successfully", data: result });
   } catch (error) {
     next(error);
   }
