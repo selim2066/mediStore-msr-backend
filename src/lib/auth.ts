@@ -16,6 +16,146 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+transporter.verify((error, success) => {
+  if (error) {
+    console.error("[SMTP] Connection failed on startup:", error.message);
+  } else {
+    console.log("[SMTP] Server is ready to send emails");
+  }
+});
+
+export const auth = betterAuth({
+  baseURL: process.env.APP_URL || "http://localhost:5000",
+  database: prismaAdapter(prisma, {
+    provider: "postgresql",
+  }),
+
+  trustedOrigins: [process.env.FRONTEND_URL || "http://localhost:3000"],
+
+  emailAndPassword: {
+    enabled: true,
+    requireEmailVerification: true,
+    autoSignIn: false,
+  },
+
+  emailVerification: {
+    autoSignInAfterVerification: true,
+    sendOnSignUp: true,
+
+    // sendVerificationEmail: async ({ user, token }) => {
+    //   const verificationURL = `${process.env.APP_URL}/api/auth/verify-email?token=${token}`;
+
+    //   const info = await transporter.sendMail({
+    //     from: `"MediStore" <${process.env.APP_EMAIL}>`,
+    //     to: user.email || "test@example.com",
+    //     subject: "Please verify your email address",
+
+    //     text: "Please verify your email",
+
+    //     html: `
+    //       <div style="font-family: Arial; padding: 40px;">
+    //         <h2>Verify Your Email Address</h2>
+
+    //         <p>Assalamu Alaikum ${user.name || "User"},</p>
+
+    //         <p>Please confirm your email by clicking below:</p>
+
+    //         <a href="${verificationURL}"
+    //           style="background:#2563eb;color:white;padding:10px 20px;text-decoration:none;border-radius:6px;">
+    //           Verify Email
+    //         </a>
+
+    //         <p>If button doesn't work:</p>
+    //         <p>${verificationURL}</p>
+    //       </div>
+    //     `,
+    //   });
+
+    //   console.log("Email sent:", info.messageId);
+    // },
+
+    // ! update
+    sendVerificationEmail: async ({ user, token }) => {
+      const verificationURL = `${process.env.APP_URL}/api/auth/verify-email?token=${token}&callbackURL=${process.env.FRONTEND_URL}/login`;
+
+      try {
+        const info = await transporter.sendMail({
+          from: `"MediStore" <${process.env.APP_EMAIL}>`,
+          to: user.email,
+          subject: "Please verify your email address",
+          text: `Verify your email: ${verificationURL}`,
+          html: `
+        <div style="font-family: Arial; padding: 40px;">
+          <h2>Verify Your Email Address</h2>
+          <p>Assalamu Alaikum ${user.name || "User"},</p>
+          <p>Please confirm your email by clicking below:</p>
+          <a href="${verificationURL}"
+            style="background:#2563eb;color:white;padding:10px 20px;text-decoration:none;border-radius:6px;">
+            Verify Email
+          </a>
+          <p>If the button doesn't work, copy this link:</p>
+          <p>${verificationURL}</p>
+        </div>
+      `,
+        });
+
+        console.log("[EMAIL] Verification email sent:", {
+          messageId: info.messageId,
+          to: user.email,
+          accepted: info.accepted,
+          rejected: info.rejected,
+        });
+      } catch (error) {
+        // This is the critical line — without it you'd never know what failed
+        console.error("[EMAIL] Failed to send verification email:", {
+          to: user.email,
+          error: error instanceof Error ? error.message : error,
+        });
+        throw error; // re-throw so BetterAuth knows the send failed
+      }
+    },
+  },
+
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        required: true,
+        defaultValue: "CUSTOMER",
+        input: true,
+      },
+
+      isBanned: {
+        type: "boolean",
+        required: false,
+        defaultValue: false,
+        input: false,
+      },
+
+      phone: {
+        type: "string",
+        required: false,
+        input: true,
+      },
+
+      address: {
+        type: "string",
+        required: false,
+        input: true,
+      },
+    },
+  },
+
+  advanced: {
+    cookiePrefix: "medistore",
+    defaultCookieAttributes: {
+      sameSite: "none",
+      secure: true,
+      partitioned: true,
+    },
+  },
+});
+
 // export const auth = betterAuth({
 //   database: prismaAdapter(prisma, {
 //     provider: "postgresql", // or "mysql", "postgresql", ...etc
@@ -113,94 +253,3 @@ const transporter = nodemailer.createTransport({
 //     },}
 
 // });
-
-export const auth = betterAuth({
-  baseURL: process.env.APP_URL || "http://localhost:5000",
-  database: prismaAdapter(prisma, {
-    provider: "postgresql",
-  }),
-
-  trustedOrigins: [process.env.FRONTEND_URL || "http://localhost:3000"],
-
-  emailAndPassword: {
-    enabled: true,
-    requireEmailVerification: true,
-    autoSignIn: false,
-  },
-
-  emailVerification: {
-    autoSignInAfterVerification: true,
-    sendOnSignUp: true,
-
-    sendVerificationEmail: async ({ user, token }) => {
-      const verificationURL = `${process.env.APP_URL}/api/auth/verify-email?token=${token}`;
-
-      const info = await transporter.sendMail({
-        from: '"hijibiji" <hijibiji@ethereal.email>',
-        to: user.email || "test@example.com",
-        subject: "Please verify your email address",
-
-        text: "Please verify your email",
-
-        html: `
-          <div style="font-family: Arial; padding: 40px;">
-            <h2>Verify Your Email Address</h2>
-
-            <p>Assalamu Alaikum ${user.name || "User"},</p>
-
-            <p>Please confirm your email by clicking below:</p>
-
-            <a href="${verificationURL}"
-              style="background:#2563eb;color:white;padding:10px 20px;text-decoration:none;border-radius:6px;">
-              Verify Email
-            </a>
-
-            <p>If button doesn't work:</p>
-            <p>${verificationURL}</p>
-          </div>
-        `,
-      });
-
-      console.log("Email sent:", info.messageId);
-    },
-  },
-
-  user: {
-    additionalFields: {
-      role: {
-        type: "string",
-        required: true,
-        defaultValue: "CUSTOMER",
-        input: true,
-      },
-
-      isBanned: {
-        type: "boolean",
-        required: false,
-        defaultValue: false,
-        input: false,
-      },
-
-      phone: {
-        type: "string",
-        required: false,
-        input: true,
-      },
-
-      address: {
-        type: "string",
-        required: false,
-        input: true,
-      },
-    },
-  },
-
-  advanced: {
-    cookiePrefix: "medistore",
-    defaultCookieAttributes: {
-      sameSite: "none",
-      secure: true,
-      partitioned: true,
-    },
-  },
-});
