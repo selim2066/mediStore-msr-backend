@@ -25,7 +25,7 @@ transporter.verify((error, success) => {
 });
 
 export const auth = betterAuth({
-  baseURL: process.env.APP_URL || "http://localhost:5000",
+   baseURL: process.env.BETTER_AUTH_URL || process.env.APP_URL || "http://localhost:5000",
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
@@ -222,7 +222,7 @@ This verification link may expire for security reasons.<br/>
   google: {
     clientId: process.env.GOOGLE_CLIENT_ID as string,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-    
+
   },
 },
 
