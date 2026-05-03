@@ -266,7 +266,6 @@ This verification link may expire for security reasons.<br/>
 
   advanced: {
     cookiePrefix: "medistore",
-    useSecureCookies: true,
     defaultCookieAttributes: {
       sameSite: "none",
       secure: true,
