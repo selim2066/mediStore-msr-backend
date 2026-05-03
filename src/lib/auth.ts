@@ -229,7 +229,7 @@ This verification link may expire for security reasons.<br/>
   google: {
     clientId: process.env.GOOGLE_CLIENT_ID as string,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-   redirectURI: process.env.APP_URL + "/api/auth/callback/google",
+    redirectURI: `${process.env.APP_URL}/api/auth/callback/google`,
   },
 },
 
