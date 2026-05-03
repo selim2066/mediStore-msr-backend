@@ -30,7 +30,11 @@ export const auth = betterAuth({
     provider: "postgresql",
   }),
 
-  trustedOrigins: [process.env.FRONTEND_URL || "http://localhost:3000"],
+  trustedOrigins: [
+  process.env.FRONTEND_URL || "http://localhost:3000",
+  "https://medi-store-msr-frontend.vercel.app",
+  "https://medistore-msr-backend.onrender.com",
+],
 
   emailAndPassword: {
     enabled: true,
@@ -222,6 +226,7 @@ This verification link may expire for security reasons.<br/>
   google: {
     clientId: process.env.GOOGLE_CLIENT_ID as string,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+    redirectURI: "https://medistore-msr-backend.onrender.com/api/auth/callback/google",
 
   },
 },
