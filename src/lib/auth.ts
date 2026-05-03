@@ -225,14 +225,13 @@ This verification link may expire for security reasons.<br/>
     },
   },
 
-  socialProviders: {
-    google: {
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-      redirectURI:
-        "https://medistore-msr-backend.onrender.com/api/auth/callback/google",
-    },
+ socialProviders: {
+  google: {
+    clientId: process.env.GOOGLE_CLIENT_ID as string,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+   redirectURI: process.env.APP_URL + "/api/auth/callback/google",
   },
+},
 
   user: {
     additionalFields: {
