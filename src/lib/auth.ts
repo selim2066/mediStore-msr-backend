@@ -25,16 +25,19 @@ transporter.verify((error, success) => {
 });
 
 export const auth = betterAuth({
-   baseURL: process.env.BETTER_AUTH_URL || process.env.APP_URL || "http://localhost:5000",
+  baseURL:
+    process.env.BETTER_AUTH_URL ||
+    process.env.APP_URL ||
+    "http://localhost:5000",
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
 
   trustedOrigins: [
-  process.env.FRONTEND_URL || "http://localhost:3000",
-  "https://medi-store-msr-frontend.vercel.app",
-  "https://medistore-msr-backend.onrender.com",
-],
+    process.env.FRONTEND_URL || "http://localhost:3000",
+    "https://medi-store-msr-frontend.vercel.app",
+    "https://medistore-msr-backend.onrender.com",
+  ],
 
   emailAndPassword: {
     enabled: true,
@@ -223,13 +226,13 @@ This verification link may expire for security reasons.<br/>
   },
 
   socialProviders: {
-  google: {
-    clientId: process.env.GOOGLE_CLIENT_ID as string,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-    redirectURI: "https://medistore-msr-backend.onrender.com/api/auth/callback/google",
-
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      redirectURI:
+        "https://medistore-msr-backend.onrender.com/api/auth/callback/google",
+    },
   },
-},
 
   user: {
     additionalFields: {
@@ -263,6 +266,7 @@ This verification link may expire for security reasons.<br/>
 
   advanced: {
     cookiePrefix: "medistore",
+    useSecureCookies: true,
     defaultCookieAttributes: {
       sameSite: "none",
       secure: true,
