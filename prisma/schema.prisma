@@ -89,13 +89,14 @@ model Category {
 ///////////////////////
 
 model Medicine {
-  id           String  @id @default(uuid())
+  id           String   @id @default(uuid())
   name         String
   description  String
   price        Float
   stock        Int
   manufacturer String
   image        String?
+  images       String[]
 
   sellerId String
   seller   User   @relation("SellerMedicines", fields: [sellerId], references: [id])

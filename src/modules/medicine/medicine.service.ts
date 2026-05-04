@@ -17,15 +17,16 @@ type GetAllMedicinesQuery = {
 
 const createMedicineService = async (
   sellerId: string,
-  data: {
-    name: string;
-    description: string;
-    price: number;
-    stock: number;
-    manufacturer: string;
-    categoryId: string;
-    image?: string;
-  },
+    data: {
+      name: string;
+      description: string;
+      price: number;
+      stock: number;
+      manufacturer: string;
+      categoryId: string;
+      image?: string;
+      images?: string[];
+    },
 ) => {
   return await prisma.medicine.create({
     data: {
@@ -174,6 +175,7 @@ const updateMedicineService = async (
     stock?: number;
     manufacturer?: string;
     image?: string;
+    images?: string[];
     categoryId?: string;
   },
 ) => {

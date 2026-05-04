@@ -26,7 +26,13 @@ const createMedicineController = async (req:Request, res:Response, next:NextFunc
     }
 
     //const image = req.file?.originalname || ""; // temporary
+    
     const image = req.body.image || null
+    const images = req.body.images
+  ? Array.isArray(req.body.images)
+    ? req.body.images
+    : [req.body.images]
+  : [];
 
     const medicine = await MedicineService.createMedicineService(
       req.user!.id,
@@ -37,6 +43,7 @@ const createMedicineController = async (req:Request, res:Response, next:NextFunc
         stock: parseInt(stock),
         manufacturer,
         image,
+        images,
         categoryId
       }
     );
